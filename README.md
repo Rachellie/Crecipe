@@ -1,5 +1,4 @@
-# Crecipe
-Co-Op Cooking Simulation Mobile Game
+# Crecipe | Co-Op Cooking Simulation Mobile Game
 
 
 All models, animations, images, and textures are not uploaded here for licence reasons
