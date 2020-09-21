@@ -5,6 +5,8 @@ All models, animations, images, and textures are not uploaded here for license r
 
 All code for this game is displayed here
 
-HashTable is the database of all recipes and ingredients available in the game
+HashTable is the old database of all recipes and ingredients available in the game (has been deleted)
 
-Note: Currently devising a new database structure to change complexity of O(n) to O(1)
+Database is now the new database -> some files have not been updated to use the new database (in progress)
+
+Note: new database structure has amortized complexity of O(1)
