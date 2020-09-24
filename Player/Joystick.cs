@@ -23,7 +23,14 @@ public class Joystick : MonoBehaviour
 	public AudioClip pathSound;
 	public AudioClip sandSound;
 
-	void Start()
+    
+    public Material red;
+    public Material blue;
+    public Material green;
+    public Material purple;
+    public Material orange;
+
+    void Start()
     {
 		transform.position = PlayerData.player.GetPosition();
 		transform.Rotate(PlayerData.player.GetRotation());
@@ -32,6 +39,29 @@ public class Joystick : MonoBehaviour
 		
 		terrain = Terrain.activeTerrain;
 		audio = GetComponent<AudioSource>();
+
+        GameObject player = GameObject.FindWithTag("Player");
+
+        if (PlayerData.player.GetPlayerMaterial() == "PlayerRed")
+        {
+            player.GetComponent<Renderer>().material = red;
+        }
+        else if (PlayerData.player.GetPlayerMaterial() == "PlayerBlue")
+        {
+            player.GetComponent<Renderer>().material = blue;
+        }
+        else if (PlayerData.player.GetPlayerMaterial() == "PlayerGreen")
+        {
+            player.GetComponent<Renderer>().material = green;
+        }
+        else if (PlayerData.player.GetPlayerMaterial() == "PlayerOrange")
+        {
+            player.GetComponent<Renderer>().material = orange;
+        }
+        else
+        {
+            player.GetComponent<Renderer>().material = purple;
+        }
     }
 	
 	// Update is called once per frame
@@ -87,6 +117,38 @@ public class Joystick : MonoBehaviour
 	void moveCharacter(Vector3 direction)
 	{
 		player.SimpleMove(direction * speed);
+		bool W = false;
+		bool S = false;
+		bool A = false;
+		bool D = false;
+		
+		if(direction.z > 0)
+		{
+			W = true;
+		}
+		if(direction.z < 0)
+		{
+			S = true;
+		}
+		if(direction.x < 0)
+		{
+			A = true;
+		}
+		if(direction.x > 0)
+		{
+			D = true;
+		}
+		
+        bool[] _inputs = new bool[]
+        {
+            W, S, A, D
+        };
+		
+		if(Client.instance.IsConnected())
+		{
+			ClientSend.PlayerMovement(_inputs);
+		}
+		
 		player.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
     }
 	
@@ -125,7 +187,7 @@ public class Joystick : MonoBehaviour
 	
 	private void PlayFootstep()
 	{
-		audio.volume = Random.Range(0.1f, 0.3f);
+		audio.volume = Random.Range(0.1f, 0.3f) * PlayerPrefs.GetFloat("sound", 0.5f);
 		audio.pitch = Random.Range(0.8f, 1.1f);
 		
 		if(terrain != null)

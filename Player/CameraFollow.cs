@@ -11,12 +11,14 @@ public class CameraFollow : MonoBehaviour
 	public float y = 3f;
 	public float z = -4f;
 	
+	public float multiplier = 1f;
+	
     // Update is called once per frame
     void Update()
     {
         cam.transform.position = new Vector3(
-			player.transform.position.x + x, 
-			player.transform.position.y + y, 
-			player.transform.position.z + z);
+			player.transform.position.x*multiplier + x, 
+			player.transform.position.y*multiplier + y, 
+			player.transform.position.z*multiplier + z);
     }
 }

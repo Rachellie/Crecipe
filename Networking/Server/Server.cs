@@ -131,7 +131,11 @@ namespace GameServer
 				{
 					{ (int)ClientPackets.welcomeReceived, ServerHandle.WelcomeReceived },
 					{ (int)ClientPackets.playerMovement, ServerHandle.PlayerMovement },
-					{ (int)ClientPackets.playerColor, ServerHandle.PlayerColor }
+					{ (int)ClientPackets.playerColor, ServerHandle.PlayerColor },
+					{ (int)ClientPackets.playerFood, ServerHandle.PlayerFood },
+					{ (int)ClientPackets.updateFridge, ServerHandle.UpdateFridge },
+					{ (int)ClientPackets.updateCounter, ServerHandle.UpdateCounter },
+					{ (int)ClientPackets.updateAppliance, ServerHandle.UpdateAppliance }
 				};
 			Debug.Log("Initialized packets.");
 		}

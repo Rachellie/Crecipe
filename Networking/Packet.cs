@@ -13,7 +13,22 @@ public enum ServerPackets
     playerRotation,
 	disconnect,
 	removeClient,
-	setColor
+	setColor,
+	setFood,
+	setFridge,
+	updateFridge,
+	setCounters,
+	updateCounter,
+	
+	setKettle,
+	setKnife,
+	setHand,
+	setPan,
+	setPot,
+	setOven,
+	setBlender,
+	setRiceCooker,
+	updateAppliance
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -21,7 +36,11 @@ public enum ClientPackets
 {
     welcomeReceived = 1,
     playerMovement,
-	playerColor
+	playerColor,
+	playerFood,
+	updateFridge,
+	updateCounter,
+	updateAppliance
 }
 
 public class Packet : IDisposable

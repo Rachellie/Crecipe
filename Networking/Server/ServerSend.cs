@@ -87,6 +87,18 @@ namespace GameServer
 
 				SendTCPData(_toClient, _packet);
 			}
+			
+			SetFridge(_toClient);
+			SetCounters(_toClient);
+			
+			SetKettle(_toClient);
+			SetKnife(_toClient);
+			SetHand(_toClient);
+			SetPan(_toClient);
+			SetPot(_toClient);
+			SetOven(_toClient);
+			SetBlender(_toClient);
+			SetRiceCooker(_toClient);
 		}
 		
 		public static void DisconnectClients(string _msg)
@@ -161,6 +173,184 @@ namespace GameServer
 				_packet.Write(color);
 				
 				SendTCPDataToAll(_packet);
+			}
+		}
+		
+		public static void SetFood(int fromClient, string food)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setFood))
+			{
+				_packet.Write(fromClient);
+				_packet.Write(food);
+				
+				SendTCPDataToAll(_packet);
+			}
+		}
+		
+		public static void SetFridge(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setFridge))
+			{
+				foreach(FoodObject food in PlayerData.player.GetFridge())
+				{
+					if(food != null)
+					{
+						_packet.Write(food.getName());
+						_packet.Write(food.getQuantity());
+					}
+					else
+					{
+						_packet.Write("null");
+						_packet.Write(0);
+					}
+				}
+				
+				SendTCPData(_toClient, _packet);
+			}
+		}
+		
+		public static void UpdateFridge(int fromClient, int slot, string name, int quantity)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.updateFridge))
+			{
+				_packet.Write(slot);
+				_packet.Write(name);
+				_packet.Write(quantity);
+				
+				SendTCPDataToAll(fromClient, _packet);
+			}
+		}
+		
+		public static void SetCounters(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setCounters))
+			{
+				foreach(FoodObject food in PlayerData.player.GetCounters())
+				{
+					if(food != null)
+					{
+						_packet.Write(food.getName());
+						_packet.Write(food.getQuantity());
+					}
+					else
+					{
+						_packet.Write("null");
+						_packet.Write(0);
+					}
+				}
+				
+				SendTCPData(_toClient, _packet);
+			}
+		}
+		
+		public static void UpdateCounter(int fromClient, int num, string name, int quantity)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.updateCounter))
+			{
+				_packet.Write(num);
+				_packet.Write(name);
+				_packet.Write(quantity);
+				
+				SendTCPDataToAll(fromClient, _packet);
+			}
+		}
+		
+		public static void SetKettle(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setKettle))
+			{
+				//
+			}
+		}
+		
+		public static void SetKnife(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setKnife))
+			{
+				_packet.Write(Knife.ingredientSet.Count);
+				
+				foreach(FoodObject food in Knife.ingredientSet)
+				{
+					_packet.Write(food.getName());
+					_packet.Write(food.getQuantity());
+				}
+				
+				SendTCPData(_toClient, _packet);
+			}
+		}
+		
+		public static void SetHand(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setHand))
+			{
+				//
+			}
+		}
+		
+		public static void SetPan(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setPan))
+			{
+				_packet.Write(Pan.ingredientSet.Count);
+				
+				foreach(FoodObject food in Pan.ingredientSet)
+				{
+					_packet.Write(food.getName());
+					_packet.Write(food.getQuantity());
+				}
+				
+				SendTCPData(_toClient, _packet);
+			}
+		}
+		
+		public static void SetPot(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setPot))
+			{
+				//
+			}
+		}
+		
+		public static void SetOven(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setOven))
+			{
+				_packet.Write(Oven.ingredientSet.Count);
+				
+				foreach(FoodObject food in Oven.ingredientSet)
+				{
+					_packet.Write(food.getName());
+					_packet.Write(food.getQuantity());
+				}
+				
+				SendTCPData(_toClient, _packet);
+			}
+		}
+		
+		public static void SetBlender(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setBlender))
+			{
+				//
+			}
+		}
+		
+		public static void SetRiceCooker(int _toClient)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.setRiceCooker))
+			{
+				//
+			}
+		}
+		
+		public static void UpdateAppliance(int fromClient, string appName, string foodName)
+		{
+			using (Packet _packet = new Packet((int)ServerPackets.updateAppliance))
+			{
+				_packet.Write(appName);
+				_packet.Write(foodName);
+				
+				SendTCPDataToAll(fromClient, _packet);
 			}
 		}
 		#endregion

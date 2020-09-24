@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
@@ -9,13 +10,21 @@ using System.IO;
 class PlayerInfo
 {
 	public string name = "Player";
+    public string playerMaterial = "PlayerPurple";
+	
 	public List<FoodObject> fridge = new List<FoodObject>();
-	public List<FoodObject> spices = new List<FoodObject>();
 	public List<FoodObject> bag = new List<FoodObject>();
+	public List<FoodObject> counters = new List<FoodObject>();
+	
 	public float money = 30f;
+	
 	public int level = 10;
-	public float xp = 0.1f;
-	public float happiness = 0.5f;
+	public int xp = 5;
+	//public int maxXP = 100;
+	
+	public int happiness = 70;
+	//public int maxHappiness = 100;
+	
 	public FoodObject currentFood = null;
 }
 
@@ -23,10 +32,9 @@ public class PlayerData : MonoBehaviour
 {
 	public static PlayerData player;
 	private PlayerInfo playerInfo = new PlayerInfo();
-	private Vector3 position = new Vector3(0f, 6.29f, -1f);
+	private Vector3 position = new Vector3(2f, 6.26f, -33f);
 	private Vector3 rotation = new Vector3(0f, 0f, 0f);
-	private HashTable shopTable = new HashTable();
-	private HashTable recipeTable = new HashTable();
+	private Database database = new Database();
 	
 	void Awake()
 	{
@@ -35,17 +43,21 @@ public class PlayerData : MonoBehaviour
 		{
 			DontDestroyOnLoad(gameObject);
 			player = this;
-			shopTable.BuildDatabase();
-			recipeTable.BuildRecipeDatabase();
+			database.BuildDatabase();
+			database.BuildShopDatabase();
+			database.BuildRecipeDatabase();
 			
+			for(int i = 0; i < 56; ++i)
+			{
+				playerInfo.fridge.Add(null);
+			}
 			for(int i = 0; i < 16; ++i)
 			{
 				playerInfo.bag.Add(null);
 			}
-			for(int i = 0; i < 56; ++i)
+			for(int i = 0; i < 36; ++i)
 			{
-				playerInfo.fridge.Add(null);
-				playerInfo.spices.Add(null);
+				playerInfo.counters.Add(null);
 			}
 		}
 		else if(player != this)
@@ -57,52 +69,76 @@ public class PlayerData : MonoBehaviour
         //FindObjectOfType<AudioManager>().Play("theme");
 	}
 	
-	public List<List<FoodObject>> GetTable()
+	public List<Dictionary<string, FoodObject>> GetDB()
 	{
-		return shopTable.GetTable();
+		return database.database;
 	}
 	
-	public List<List<FoodObject>> GetRecipeTable()
+	public List<Dictionary<string, FoodObject>> GetShopDB()
 	{
-		return recipeTable.GetTable();
+		return database.shopDatabase;
+	}
+	
+	public List<Dictionary<string, FoodObject>> GetRecipeDB()
+	{
+		return database.recipeDatabase;
 	}
 	
 	public string GetName()
 	{
 		return playerInfo.name;
 	}
+
 	public void SetName(string newName)
 	{
 		playerInfo.name = newName;
+        RefreshStats();
 	}
+
+    public string GetPlayerMaterial()
+    {
+        return playerInfo.playerMaterial;
+    }
+
+    public void SetPlayerMaterial(string newMaterial)
+    {
+        playerInfo.playerMaterial = newMaterial;
+        RefreshStats();
+    }
 	
 	public List<FoodObject> GetFridge()
 	{
 		return playerInfo.fridge;
 	}
+	public void SetFridge(List<FoodObject> newFridge)
+	{
+		playerInfo.fridge = newFridge;
+	}
 	
-	public void AddFoodItem(FoodObject food)
+	public bool AddFoodItem(FoodObject food)
 	{
 		List<FoodObject> location = playerInfo.bag;
 
 		// find if foodItem exists
-		for (int i = 0; i < location.Count; ++i)
+		for (int i = 0; i < 15; ++i)
 		{
 			if (location[i] != null && food.getName() == location[i].getName())
 			{
 				location[i].setQuantity(location[i].getQuantity() + food.getQuantity());
-				return;
+				return true;
 			}
 		}
 		// if foodItem does not exist create new copy of foodItem and add to first null slot
-		for(int i = 0; i < location.Count; ++i)
+		for(int i = 0; i < 15; ++i)
 		{
 			if(location[i] == null)
 			{
 				location[i] = new FoodObject(food);
-				return;
+				return true;
 			}
 		}
+		
+		return false;
 	}
 	
 	public void RemoveFoodItem(FoodObject food)
@@ -178,6 +214,9 @@ public class PlayerData : MonoBehaviour
 		FoodObject temp = playerInfo.fridge[indexFrom];
         playerInfo.fridge[indexFrom] = playerInfo.fridge[indexTo];
         playerInfo.fridge[indexTo] = temp;
+		
+		ClientSend.UpdateFridge(indexFrom);
+		ClientSend.UpdateFridge(indexTo);
 	}
 
 	// from bag to inventory
@@ -196,6 +235,8 @@ public class PlayerData : MonoBehaviour
 		FoodObject temp = playerInfo.bag[indexFrom];
 		playerInfo.bag[indexFrom] = playerInfo.fridge[indexTo];
         playerInfo.fridge[indexTo] = temp;
+		
+		ClientSend.UpdateFridge(indexTo);
 	}
 	
 	// from inventory to bag
@@ -214,6 +255,28 @@ public class PlayerData : MonoBehaviour
 		FoodObject temp = playerInfo.fridge[indexFrom];
         playerInfo.fridge[indexFrom] = playerInfo.bag[indexTo];
 		playerInfo.bag[indexTo] = temp;
+		
+		ClientSend.UpdateFridge(indexFrom);
+	}
+	
+	public FoodObject GetCounterFood(int index)
+	{
+		return playerInfo.counters[index];
+	}
+	public void SetCounterFood(int index, FoodObject food)
+	{
+		playerInfo.counters[index] = food;
+		
+		ClientSend.UpdateCounter(index);
+	}
+	
+	public List<FoodObject> GetCounters()
+	{
+		return playerInfo.counters;
+	}
+	public void SetCounters(List<FoodObject> newCounters)
+	{
+		playerInfo.counters = newCounters;
 	}
 	
 	public float GetMoney()
@@ -223,6 +286,12 @@ public class PlayerData : MonoBehaviour
 	public void SetMoney(float amount)
 	{
 		playerInfo.money = amount;
+		RefreshStats();
+	}
+	public void AddMoney(float amount)
+	{
+		playerInfo.money += amount;
+		RefreshStats();
 	}
 	
 	public int GetLevel()
@@ -232,25 +301,74 @@ public class PlayerData : MonoBehaviour
 	public void SetLevel(int lvl)
 	{
 		playerInfo.level = lvl;
+		RefreshStats();
 	}
 	
-	public float GetXP()
+	public int GetXP()
 	{
 		return playerInfo.xp;
 	}
-	public void SetXP(float amount)
+	public void SetXP(int amount)
 	{
-		playerInfo.xp = amount;
+		if(amount > GetMaxXP())
+		{
+			playerInfo.xp = amount - GetMaxXP();
+			++playerInfo.level;
+		}
+		else
+		{
+			playerInfo.xp = amount;
+		}
+		
+		RefreshStats();
 	}
 	
-	public float GetHappiness()
+	public int GetMaxXP()
+	{
+		return playerInfo.level * 10;
+	}
+	// public void SetMaxXP(int max)
+	// {
+		// playerInfo.maxXP = max;
+		// RefreshStats();
+	// }
+	
+	public int GetHappiness()
 	{
 		return playerInfo.happiness;
 	}
-	public void SetHappiness(float amount)
+	public void SetHappiness(int amount)
 	{
-		playerInfo.happiness = amount;
+		if(amount < 0)
+		{
+			playerInfo.happiness = 0;
+		}
+		else if(amount > GetMaxHappiness())
+		{
+			playerInfo.happiness = GetMaxHappiness();
+		}
+		else
+		{
+			playerInfo.happiness = amount;
+		}
+		
+		RefreshStats();
 	}
+	public void AddHappiness(float amount)
+	{
+		playerInfo.happiness += Convert.ToInt32(amount);
+		RefreshStats();
+	}
+	
+	public int GetMaxHappiness()
+	{
+		return (playerInfo.level*10) + 20;
+	}
+	// public void SetMaxHappiness(int max)
+	// {
+		// playerInfo.maxHappiness = max;
+		// RefreshStats();
+	// }
 	
 	public Vector3 GetPosition()
 	{
@@ -276,13 +394,13 @@ public class PlayerData : MonoBehaviour
 	}
 	public void SetCurrentFood(FoodObject food)
 	{
-		playerInfo.bag[15] = food;
+		GameObject player = GameObject.FindWithTag("Player");
+        GameObject buttonEat = GameObject.Find("/Canvas/ButtonEat");
 		
-		GameObject player = GameObject.Find("Player");
-		
-		if(food == null)
+		if(food == null || food.getQuantity() <= 0)
 		{
 			playerInfo.currentFood = null;
+			playerInfo.bag[15] = null;
 			
 			if(player != null)
 			{
@@ -292,10 +410,13 @@ public class PlayerData : MonoBehaviour
 				}
 			}
 			Debug.Log("you currently have NOTHING");
+            buttonEat.GetComponent<Image>().enabled = false;
+			ClientSend.PlayerFood("null");
 			return;
 		}
 		
 		playerInfo.currentFood = new FoodObject(food);
+		playerInfo.bag[15] = food;
 		
 		if(player != null)
 		{
@@ -305,14 +426,15 @@ public class PlayerData : MonoBehaviour
 			}
 			
 			Instantiate(Resources.Load(playerInfo.currentFood.getModel()), player.transform);
-			if(playerInfo.currentFood.getPlate())
-			{
-				Instantiate(Resources.Load("Models/plate"), player.transform);
-				player.transform.GetChild(2).localPosition += new Vector3(0f, 0.03f, 0f);
-			}
 		}
 		Debug.Log("you currently have " + playerInfo.currentFood.getName());
-	}
+		ClientSend.PlayerFood(food.getName());
+		
+		if(playerInfo.currentFood.getName() != "Plate")
+		{
+			buttonEat.GetComponent<Image>().enabled = true;
+		}
+    }
 	
 	public void Save()
 	{
@@ -331,6 +453,16 @@ public class PlayerData : MonoBehaviour
 			FileStream file = File.Open(Application.persistentDataPath + "/playerData.food", FileMode.Open);
 			playerInfo = (PlayerInfo)bf.Deserialize(file);
 			file.Close();
+		}
+	}
+	
+	private void RefreshStats()
+	{
+		GameObject stats = GameObject.FindWithTag("Stats");
+		
+		if(stats != null)
+		{
+			stats.GetComponent<Stats>().Refresh();
 		}
 	}
 }

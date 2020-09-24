@@ -40,5 +40,34 @@ namespace GameServer
 			string color = _packet.ReadString();
 			ServerSend.SetColor(_fromClient, color);
 		}
+		
+		public static void PlayerFood(int _fromClient, Packet _packet)
+		{
+			string food = _packet.ReadString();
+			ServerSend.SetFood(_fromClient, food);
+		}
+		
+		public static void UpdateFridge(int _fromClient, Packet _packet)
+		{
+			int slot = _packet.ReadInt();
+			string name = _packet.ReadString();
+			int quantity = _packet.ReadInt();
+			ServerSend.UpdateFridge(_fromClient, slot, name, quantity);
+		}
+		
+		public static void UpdateCounter(int _fromClient, Packet _packet)
+		{
+			int num = _packet.ReadInt();
+			string name = _packet.ReadString();
+			int quantity = _packet.ReadInt();
+			ServerSend.UpdateCounter(_fromClient, num, name, quantity);
+		}
+		
+		public static void UpdateAppliance(int _fromClient, Packet _packet)
+		{
+			string appName = _packet.ReadString();
+			string foodName = _packet.ReadString();
+			ServerSend.UpdateAppliance(_fromClient, appName, foodName);
+		}
 	}
 }

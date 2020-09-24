@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Bag : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class Bag : MonoBehaviour
     public GameObject itemSlot;
     public Transform parent;
 	public bool inventory;
+    public TMP_Text text;
 
     // index 15 is ItemSlotSelected
     private List<Transform> slotsList = new List<Transform>();
@@ -82,14 +84,18 @@ public class Bag : MonoBehaviour
 			
 			if(currentFood != null)
 			{
-				Instantiate(Resources.Load(currentFood.getModel()), Model);
-				if(currentFood.getPlate())
-				{
-					Instantiate(Resources.Load("Models/plate"), Model);
-					Model.GetChild(1).localPosition += new Vector3(0f, -0.03f, 0f);
-				}
+				Instantiate(Resources.Load(currentFood.getModel()), Model);//
 			}
 		}
+        //put Food Name
+        if(PlayerData.player.GetCurrentFood() != null && text != null)
+        {
+            text.text = PlayerData.player.GetCurrentFood().getName();
+        }
+        else if(text != null)
+        {
+            text.text = "";
+        }
 	}
 
     private void createSlots()

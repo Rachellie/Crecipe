@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
 using System;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Client : MonoBehaviour
 {
@@ -49,13 +50,25 @@ public class Client : MonoBehaviour
 	{
 		return isConnected;
 	}
+	
+	public void SetConnected(bool connected)
+	{
+		isConnected = connected;
+	}
 
     /// <summary>Attempts to connect to the server.</summary>
     public void ConnectToServer()
     {
+		if(!GameServer.NetworkManager.instance.ServerStarted())
+		{
+			// move client to spawn
+			PlayerData.player.SetPosition(new Vector3(2f, 6.26f, -33f));
+			SceneManager.LoadScene("HomeScene");
+		}
+		
+		
         InitializeClientData();
-
-        isConnected = true;
+		
 		Debug.Log("connect called");
         tcp.Connect(); // Connect tcp, udp gets connected once tcp is done
     }
@@ -227,6 +240,8 @@ public class Client : MonoBehaviour
             {
                 SendData(_packet);
             }
+			
+			Client.instance.SetConnected(true);
         }
 
         /// <summary>Sends data to the client via UDP.</summary>
@@ -310,7 +325,21 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.playerRotation, ClientHandle.PlayerRotation },
 			{ (int)ServerPackets.disconnect, ClientHandle.Disconnect },
 			{ (int)ServerPackets.removeClient, ClientHandle.RemoveClient },
-			{ (int)ServerPackets.setColor, ClientHandle.SetColor }
+			{ (int)ServerPackets.setColor, ClientHandle.SetColor },
+			{ (int)ServerPackets.setFood, ClientHandle.SetFood },
+			{ (int)ServerPackets.setFridge, ClientHandle.SetFridge },
+			{ (int)ServerPackets.updateFridge, ClientHandle.UpdateFridge },
+			{ (int)ServerPackets.setCounters, ClientHandle.SetCounters },
+			{ (int)ServerPackets.updateCounter, ClientHandle.UpdateCounter },
+			{ (int)ServerPackets.setKettle, ClientHandle.SetKettle },
+			{ (int)ServerPackets.setKnife, ClientHandle.SetKnife },
+			{ (int)ServerPackets.setHand, ClientHandle.SetHand },
+			{ (int)ServerPackets.setPan, ClientHandle.SetPan },
+			{ (int)ServerPackets.setPot, ClientHandle.SetPot },
+			{ (int)ServerPackets.setOven, ClientHandle.SetOven },
+			{ (int)ServerPackets.setBlender, ClientHandle.SetBlender },
+			{ (int)ServerPackets.setRiceCooker, ClientHandle.SetRiceCooker },
+			{ (int)ServerPackets.updateAppliance, ClientHandle.UpdateAppliance }
         };
         Debug.Log("Initialized packets.");
     }
@@ -329,10 +358,10 @@ public class Client : MonoBehaviour
 				GameObject.Destroy(player);
 			}
 			
+			GameManager.players.Clear();
+			
 			tcp = new TCP();
 			udp = new UDP();
-			
-			GameManager.players.Clear();
 
             Debug.Log("Client Disconnected from server.");
         }

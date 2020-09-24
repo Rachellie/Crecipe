@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ClientSend : MonoBehaviour
 {
@@ -63,8 +64,16 @@ public class ClientSend : MonoBehaviour
 			}
 			else
 			{
-				_packet.Write(new Vector3(0, 0, 0));
 				_packet.Write(new Quaternion(0, 0, 0, 0));
+				
+				if(SceneManager.GetActiveScene().name == "InventoryScene")
+				{
+					_packet.Write(PlayerData.player.GetPosition());
+				}
+				else
+				{
+					_packet.Write(new Vector3(0, -10, 0));
+				}
 			}
 
             SendUDPData(_packet);
@@ -76,6 +85,71 @@ public class ClientSend : MonoBehaviour
 		using (Packet _packet = new Packet((int)ClientPackets.playerColor))
         {
 			_packet.Write(color);
+			
+			SendTCPData(_packet);
+		}
+	}
+	
+	public static void PlayerFood(string food)
+	{
+		using (Packet _packet = new Packet((int)ClientPackets.playerFood))
+        {
+			_packet.Write(food);
+			
+			SendTCPData(_packet);
+		}
+	}
+	
+	public static void UpdateFridge(int slot)
+	{
+		using (Packet _packet = new Packet((int)ClientPackets.updateFridge))
+        {
+			_packet.Write(slot);
+			
+			FoodObject food = PlayerData.player.GetFridge()[slot];
+			if(food != null)
+			{
+				_packet.Write(food.getName());
+				_packet.Write(food.getQuantity());
+			}
+			else
+			{
+				_packet.Write("null");
+				_packet.Write(0);
+			}
+			
+			SendTCPData(_packet);
+		}
+	}
+	
+	public static void UpdateCounter(int num)
+	{
+		using (Packet _packet = new Packet((int)ClientPackets.updateCounter))
+        {
+			_packet.Write(num);
+			
+			FoodObject food = PlayerData.player.GetCounterFood(num);
+			if(food != null)
+			{
+				_packet.Write(food.getName());
+				_packet.Write(food.getQuantity());
+			}
+			else
+			{
+				_packet.Write("null");
+				_packet.Write(0);
+			}
+			
+			SendTCPData(_packet);
+		}
+	}
+	
+	public static void UpdateAppliance(string appName, string foodName)
+	{
+		using (Packet _packet = new Packet((int)ClientPackets.updateAppliance))
+        {
+			_packet.Write(appName);
+			_packet.Write(foodName);
 			
 			SendTCPData(_packet);
 		}

@@ -58,7 +58,16 @@ public class GameManager : MonoBehaviour
 
         _player.GetComponent<PlayerManager>().id = _id;
         _player.GetComponent<PlayerManager>().username = _username;
-        players.Add(_id, _player.GetComponent<PlayerManager>());
+		
+		if(!players.ContainsKey(_id))
+		{	
+			players.Add(_id, _player.GetComponent<PlayerManager>());
+		}
+		else
+		{
+			players[_id] = _player.GetComponent<PlayerManager>();
+		}
+		
 		if(_id != Client.instance.myId)
 		{
 			SetColor(_id, _color);

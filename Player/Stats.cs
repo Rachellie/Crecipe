@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 public class Stats : MonoBehaviour
 {
-	public Image barHappiness;
-	public Image barXP;
 	public Text nameLabel;
 	public Text levelLabel;
+	
+	public Bar xp;
+	public Bar happiness;
 	
     // Start is called before the first frame update
     void Start()
@@ -18,8 +19,12 @@ public class Stats : MonoBehaviour
 
     public void Refresh()
 	{
-		barHappiness.fillAmount = PlayerData.player.GetHappiness();
-		barXP.fillAmount = PlayerData.player.GetXP();
+		xp.SetMaxBarValue(PlayerData.player.GetMaxXP());
+		xp.SetBarValue(PlayerData.player.GetXP());
+		
+		happiness.SetMaxBarValue(PlayerData.player.GetMaxHappiness());
+		happiness.SetBarValue(PlayerData.player.GetHappiness());
+		
 		nameLabel.text = PlayerData.player.GetName();
 		levelLabel.text = "Lv. " + PlayerData.player.GetLevel().ToString();
 	}

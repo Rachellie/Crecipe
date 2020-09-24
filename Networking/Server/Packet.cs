@@ -15,7 +15,22 @@ namespace GameServer
 		playerRotation,
 		disconnect,
 		removeClient,
-		setColor
+		setColor,
+		setFood,
+		setFridge,
+		updateFridge,
+		setCounters,
+		updateCounter,
+		
+		setKettle,
+		setKnife,
+		setHand,
+		setPan,
+		setPot,
+		setOven,
+		setBlender,
+		setRiceCooker,
+		updateAppliance
 	}
 
 	/// <summary>Sent from client to server.</summary>
@@ -23,7 +38,11 @@ namespace GameServer
 	{
 		welcomeReceived = 1,
 		playerMovement,
-		playerColor
+		playerColor,
+		playerFood,
+		updateFridge,
+		updateCounter,
+		updateAppliance
 	}
 
 	public class Packet : IDisposable
