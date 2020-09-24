@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Database : MonoBehaviour
+public class Database
 {
     //list:dict:FoodObject
     //index for list is level requirement; 0 = fail or null
     //dictionary:  key(string of food's name ie. "sliced apples"):value(FoodObject)
 
-    private List<Dictionary<string, FoodObject>> database { get; set; } //full database (all ingredients, given-recipes, hidden-recipes) -> immutable
+    public List<Dictionary<string, FoodObject>> database { get; private set; } //full database (all ingredients, given-recipes, hidden-recipes) -> immutable
 
-    private List<Dictionary<string, FoodObject>> shopDatabase { get; set; } //all ingredients that can be bought from the shop -> immutable
+    public List<Dictionary<string, FoodObject>> shopDatabase { get; private set; } //all ingredients that can be bought from the shop -> immutable
 
     public List<Dictionary<string, FoodObject>> recipeDatabase { get; private set; } //all given-recipes -> mutable: hidden recipes can be added to this database when unlocked
 
@@ -32,7 +32,10 @@ public class Database : MonoBehaviour
 			// level 0
 			new Dictionary<string, FoodObject>()
             {
-                { "Fail", new FoodObject("Fail", "Sprites/fail", "Models/salmon", "NA", 0f, 1, -5) }
+                { "Fail", new FoodObject("Fail", "Sprites/fail", "Models/salmon", "NA", 0f, 1, -5) },
+                { "Super Fail", new FoodObject("Super Fail", "Sprites/super_fail", "Models/salmon", "NA", 0f, 1, -100) },
+                { "Water", new FoodObject("Water", "Sprites/water", "Models/salmon", "NA", 0f, 1, 0) },
+				{ "Plate", new FoodObject("Plate", "Sprites/plate", "Models/plate") },
             },
 			// level 1
 			new Dictionary<string, FoodObject>()
@@ -42,19 +45,25 @@ public class Database : MonoBehaviour
                 { "Orange", new FoodObject("Orange", "Sprites/orange", "Models/salmon", "Knife", 1f, 1, 0) },
                 { "Pear", new FoodObject("Pear", "Sprites/pear", "Models/salmon", "Knife", 1f, 1, 0) },
                 //recipes
-                { "Sliced Apples", new FoodObject("Sliced Apples", "Sprites/sliced_apples", "Models/sliced_apples", "Knife", 1f, 1, 4,
+                { "Boiling Water", new FoodObject("Boiling Water", "Sprites/boiling_water", "Models/salmon", "Kettle", 0f, 1, 0,
+                    new HashSet<FoodObject>()
+                    {
+                        new FoodObject("Water", "Sprites/water", q: 1)
+                    })
+                },
+                { "Sliced Apples", new FoodObject("Sliced Apples", "Sprites/sliced_apples", "Models/sliced_apples", "Knife", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Apple", "Sprites/apple", q: 2)
                     })
                 },
-                { "Sliced Oranges", new FoodObject("Sliced Oranges", "Sprites/sliced_oranges", "Models/sliced_oranges", "Knife", 1f, 1, 4,
+                { "Sliced Oranges", new FoodObject("Sliced Oranges", "Sprites/sliced_oranges", "Models/sliced_oranges", "Knife", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Orange", "Sprites/orange", q: 2)
                     })
                 },
-                { "Sliced Apples", new FoodObject("Sliced Pears", "Sprites/salmon", "Models/salmon", "Knife", 1f, 1, 4,
+                { "Sliced Pears", new FoodObject("Sliced Pears", "Sprites/salmon", "Models/salmon", "Knife", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Pear", "Sprites/pear", q: 2)
@@ -69,17 +78,17 @@ public class Database : MonoBehaviour
                 { "Flour", new FoodObject("Flour", "Sprites/flour", "Models/salmon", "NA", 2f, 1, 0) },
                 { "Wheat", new FoodObject("Wheat", "Sprites/wheat", "Models/salmon", "NA", 2f, 1, 0) },
                 //recipes
-                { "Bread", new FoodObject("Bread", "Sprites/bread", "Models/salmon", "Oven", 1f, 1, 8,
+                { "Bread", new FoodObject("Bread", "Sprites/bread", "Models/salmon", "Oven", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Wheat", "Sprites/wheat", q: 1),
                         new FoodObject("Flour", "Sprites/flour", q: 1)
                     })
                 },
-                { "Scrambled Egg", new FoodObject("Scrambled Egg", "Sprites/scrambled_egg", "Models/salmon", "Pan", 1f, 1, 2,
+                { "Scrambled Eggs", new FoodObject("Scrambled Eggs", "Sprites/scrambled_egg", "Models/salmon", "Pan", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
-                        new FoodObject("Egg", "Sprites/egg", q: 1)
+                        new FoodObject("Egg", "Sprites/egg", q: 3)
                     })
                 },
             },
@@ -88,11 +97,11 @@ public class Database : MonoBehaviour
             {
                 //ingredients
                 { "Pepper", new FoodObject("Pepper", "Sprites/pepper", "Models/salmon", "NA", 1f, 1, -1) },
-                { "Raw Beef", new FoodObject("Raw Beef", "Sprites/raw_beef", "Models/salmon", "NA", 3f, 1, -5) },
-                { "Raw Chicken", new FoodObject("Raw Chicken", "Sprites/raw_chicken", "Models/salmon", "NA", 2f, 1, -5) },
+                { "Raw Beef", new FoodObject("Raw Beef", "Sprites/raw_beef", "Models/salmon", "NA", 3f, 1, -4) },
+                { "Raw Chicken", new FoodObject("Raw Chicken", "Sprites/raw_chicken", "Models/salmon", "NA", 2f, 1, -4) },
                 { "Salt", new FoodObject("Salt", "Sprites/salt", "Models/salmon", "NA", 1f, 1, -1) },
                 //recipes
-                { "Steak", new FoodObject("Steak", "Sprites/steak", "Models/salmon", "Pan", 1f, 1, 10,
+                { "Steak", new FoodObject("Steak", "Sprites/steak", "Models/salmon", "Pan", 1f, 1, 8,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Raw Beef", "Sprites/raw_beef", q: 1),
@@ -100,7 +109,7 @@ public class Database : MonoBehaviour
                         new FoodObject("Pepper", "Sprites/pepper", q: 1)
                     })
                 },
-                { "Pan Seared Chicken", new FoodObject("Pan Seared Chicken", "Sprites/pan_seared_chicken", "Models/salmon", "Pan", 1f, 1, 10,
+                { "Pan Seared Chicken", new FoodObject("Pan Seared Chicken", "Sprites/pan_seared_chicken", "Models/salmon", "Pan", 1f, 1, 8,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Raw Chicken", "Sprites/raw_chicken", q: 1),
@@ -113,23 +122,23 @@ public class Database : MonoBehaviour
 			new Dictionary<string, FoodObject>()
             {
                 //ingredients
-                { "Lychee", new FoodObject("Lychee", "Sprites/lychee", "Models/salmon", "NA", 1f, 1, 0) },
-                { "Mango", new FoodObject("Mango", "Sprites/mango", "Models/salmon", "NA", 1f, 1, 0) },
-                { "Watermelon", new FoodObject("Watermelon", "Sprites/watermelon", "Models/salmon", "NA", 1f, 1, 0) },
+                { "Lychee", new FoodObject("Lychee", "Sprites/lychee", "Models/salmon", "NA", 4f, 1, 0) },
+                { "Mango", new FoodObject("Mango", "Sprites/mango", "Models/salmon", "NA", 4f, 1, 0) },
+                { "Watermelon", new FoodObject("Watermelon", "Sprites/watermelon", "Models/salmon", "NA", 4f, 1, 0) },
                 //recipes
-                { "Diced Mangos", new FoodObject("Diced Mangos", "Sprites/diced_mangos", "Models/salmon", "Knife", 1f, 1, 4,
+                { "Diced Mangos", new FoodObject("Diced Mangos", "Sprites/diced_mangos", "Models/salmon", "Knife", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Mango", "Sprites/mango", q: 2)
                     })
                 },
-                { "Skinned Lychees", new FoodObject("Skinned Lychees", "Sprites/skinned_lychees", "Models/salmon", "Knife", 1f, 1, 4,
+                { "Skinned Lychees", new FoodObject("Skinned Lychees", "Sprites/skinned_lychees", "Models/salmon", "Knife", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Lychee", "Sprites/lychee", q: 2)
                     })
                 },
-                { "Sliced Watermelon", new FoodObject("Sliced Watermelon", "Sprites/sliced_watermelon", "Models/salmon", "Knife", 1f, 1, 4,
+                { "Sliced Watermelon", new FoodObject("Sliced Watermelon", "Sprites/sliced_watermelon", "Models/salmon", "Knife", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Watermelon", "Sprites/watermelon", q: 2)
@@ -149,7 +158,7 @@ public class Database : MonoBehaviour
                 { "Onion", new FoodObject("Onion", "Sprites/onion", "Models/salmon", "NA", 1f, 1, 0) },
                 { "Tomato", new FoodObject("Tomato", "Sprites/tomato", "Models/salmon", "NA", 1f, 1, 0) },
                 //recipes
-                { "Cake", new FoodObject("Cake", "Sprites/cake", "Models/salmon", "Oven", 1f, 1, 20,
+                { "Cake", new FoodObject("Cake", "Sprites/cake", "Models/salmon", "Oven", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Baking Powder", "Sprites/baking_powder", q: 1),
@@ -160,7 +169,7 @@ public class Database : MonoBehaviour
                         new FoodObject("Sugar", "Sprites/sugar", q: 1),
                     })
                 },
-                { "Cheeseburger", new FoodObject("Cheeseburger", "Sprites/cheeseburger", "Models/salmon", "Hand", 1f, 1, 20,
+                { "Cheeseburger", new FoodObject("Cheeseburger", "Sprites/cheeseburger", "Models/salmon", "Hand", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Sliced Cheese", "Sprites/sliced_cheese", q: 1),
@@ -170,25 +179,25 @@ public class Database : MonoBehaviour
                         new FoodObject("Bread", "Sprites/bread", q: 2),
                     })
                 },
-                { "Chopped Lettuce", new FoodObject("Chopped Lettuce", "Sprites/chopped_lettuce", "Models/salmon", "Knife", 1f, 1, 20,
+                { "Chopped Lettuce", new FoodObject("Chopped Lettuce", "Sprites/chopped_lettuce", "Models/salmon", "Knife", 1f, 1, 2,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Lettuce", "Sprites/lettuce", q: 2),
                     })
                 },
-                { "Chopped Onions", new FoodObject("Chopped Onions", "Sprites/chopped_onions", "Models/salmon", "Knife", 1f, 1, 20,
+                { "Chopped Onions", new FoodObject("Chopped Onions", "Sprites/chopped_onions", "Models/salmon", "Knife", 1f, 1, 2,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Onion", "Sprites/onion", q: 2),
                     })
                 },
-                { "Sliced Cheese", new FoodObject("Sliced Cheese", "Sprites/sliced_cheese", "Models/salmon", "Knife", 1f, 1, 20,
+                { "Sliced Cheese", new FoodObject("Sliced Cheese", "Sprites/sliced_cheese", "Models/salmon", "Knife", 1f, 1, 2,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Cheese", "Sprites/cheese", q: 2),
                     })
                 },
-                { "Sliced Tomatoes", new FoodObject("Sliced Tomatoes", "Sprites/sliced_tomatoes", "Models/salmon", "Knife", 1f, 1, 20,
+                { "Sliced Tomatoes", new FoodObject("Sliced Tomatoes", "Sprites/sliced_tomatoes", "Models/salmon", "Knife", 1f, 1, 2,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Tomato", "Sprites/tomato", q: 2),
@@ -199,25 +208,25 @@ public class Database : MonoBehaviour
 			new Dictionary<string, FoodObject>()
             {
                 //ingredients
-                { "Turkey", new FoodObject("Turkey", "Sprites/turkey", "Models/salmon", "NA", 1f, 1, -1) },
-                { "Potato", new FoodObject("Potato", "Sprites/potato", "Models/salmon", "NA", 3f, 1, -5) },
-                { "Red Bean", new FoodObject("Red Bean", "Sprites/red_bean", "Models/salmon", "NA", 1f, 1, -1) },
+                { "Raw Turkey", new FoodObject("Raw Turkey", "Sprites/raw_turkey", "Models/salmon", "NA", 1f, 1, -2) },
+                { "Potato", new FoodObject("Potato", "Sprites/potato", "Models/salmon", "NA", 3f, 1, 0) },
+                { "Red Bean", new FoodObject("Red Bean", "Sprites/red_bean", "Models/salmon", "NA", 1f, 1, 0) },
                 //recipes
-                { "Baked Turkey", new FoodObject("Baked Turkey", "Sprites/baked_turkey", "Models/salmon", "Oven", 1f, 1, 1,
+                { "Baked Turkey", new FoodObject("Baked Turkey", "Sprites/baked_turkey", "Models/salmon", "Oven", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
-                        new FoodObject("Turkey", "Sprites/turkey", q: 1),
+                        new FoodObject("Raw Turkey", "Sprites/raw_turkey", q: 1),
                         new FoodObject("Salt", "Sprites/salt", q: 1),
                         new FoodObject("Pepper", "Sprites/pepper", q: 1),
                     })
                 },
-                { "Baked Potatoes", new FoodObject("Baked Potatoes", "Sprites/baked_potatoes", "Models/salmon", "Oven", 1f, 1, 1,
+                { "Baked Potato", new FoodObject("Baked Potato", "Sprites/baked_potato", "Models/salmon", "Oven", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Potato", "Sprites/potato", q: 3),
                     })
                 },
-                { "Red Bean Paste", new FoodObject("Red Bean Paste", "Sprites/red_bean_paste", "Models/salmon", "Oven", 1f, 1, 1,
+                { "Red Bean Paste", new FoodObject("Red Bean Paste", "Sprites/red_bean_paste", "Models/salmon", "Oven", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Red Bean", "Sprites/red_bean", q: 5),
@@ -231,71 +240,71 @@ public class Database : MonoBehaviour
 			new Dictionary<string, FoodObject>()
             {
                 //ingredients
-                { "Black Tea Leaves", new FoodObject("Black Tea Leaves", "Sprites/black_tea_leaves", "Models/salmon", "NA", 1f, 1, -5) },
-                { "Earl Grey Leaves", new FoodObject("Earl Grey Leaves", "Sprites/earl_grey_leaves", "Models/salmon", "NA", 1f, 1, -5) },
-                { "Green Tea Leaves", new FoodObject("Green Tea Leaves", "Sprites/green_tea_leaves", "Models/salmon", "NA", 1f, 1, -5) },
-                { "Jasmine Tea Leaves", new FoodObject("Jasmine Tea Leaves", "Sprites/jasmine_tea_leaves", "Models/salmon", "NA", 1f, 1, -5) },
-                { "Oolong Tea Leaves", new FoodObject("Oolong Tea Leaves", "Sprites/oolong_tea_leaves", "Models/salmon", "NA", 1f, 1, -5) },
-                { "Thai Tea Leaves", new FoodObject("Thai Tea Leaves", "Sprites/thai_tea_leaves", "Models/salmon", "NA", 1f, 1, -5) },
+                { "Black Tea Leaves", new FoodObject("Black Tea Leaves", "Sprites/black_tea_leaves", "Models/salmon", "NA", 1f, 1, -1) },
+                { "Earl Grey Leaves", new FoodObject("Earl Grey Leaves", "Sprites/earl_grey_leaves", "Models/salmon", "NA", 1f, 1, -1) },
+                { "Green Tea Leaves", new FoodObject("Green Tea Leaves", "Sprites/green_tea_leaves", "Models/salmon", "NA", 1f, 1, -1) },
+                { "Jasmine Tea Leaves", new FoodObject("Jasmine Tea Leaves", "Sprites/jasmine_tea_leaves", "Models/salmon", "NA", 1f, 1, -1) },
+                { "Oolong Tea Leaves", new FoodObject("Oolong Tea Leaves", "Sprites/oolong_tea_leaves", "Models/salmon", "NA", 1f, 1, -1) },
+                { "Thai Tea Leaves", new FoodObject("Thai Tea Leaves", "Sprites/thai_tea_leaves", "Models/salmon", "NA", 1f, 1, -1) },
                 //recipes
 
-                { "Black Tea", new FoodObject("Black Tea", "Sprites/black_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Black Tea", new FoodObject("Black Tea", "Sprites/black_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Black Tea Leaves", "Sprites/black_tea_leaves", q: 5),
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
                     })
                 },
-                { "Black Milk Tea", new FoodObject("Black Milk Tea", "Sprites/black_milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Black Milk Tea", new FoodObject("Black Milk Tea", "Sprites/black_milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Black Tea", "Sprites/black_tea", q: 1),
                         new FoodObject("Milk Tea", "Sprites/milk_tea", q: 1),
                     })
                 },
-                { "Earl Grey Tea", new FoodObject("Earl Grey Tea", "Sprites/earl_grey_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Earl Grey Tea", new FoodObject("Earl Grey Tea", "Sprites/earl_grey_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Earl Gray Tea Leaves", "Sprites/earl_grey_tea_leaves", q: 5),
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
                     })
                 },
-                { "Earl Grey Milk Tea", new FoodObject("Earl Grey Milk Tea", "Sprites/earl_grey_milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Earl Grey Milk Tea", new FoodObject("Earl Grey Milk Tea", "Sprites/earl_grey_milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Earl Grey Tea", "Sprites/earl_grey_tea", q: 1),
                         new FoodObject("Milk Tea", "Sprites/milk_tea", q: 1),
                     })
                 },
-                { "Green Tea", new FoodObject("Green Tea", "Sprites/green_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Green Tea", new FoodObject("Green Tea", "Sprites/green_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Green Tea Leaves", "Sprites/green_tea_leaves", q: 5),
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
                     })
                 },
-                { "Green Milk Tea", new FoodObject("Green Milk Tea", "Sprites/green_milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Green Milk Tea", new FoodObject("Green Milk Tea", "Sprites/green_milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Green Tea", "Sprites/green_tea", q: 1),
                         new FoodObject("Milk Tea", "Sprites/milk_tea", q: 1),
                     })
                 },
-                { "Jasmine Tea",  new FoodObject("Jasmine Tea", "Sprites/jasmine_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Jasmine Tea",  new FoodObject("Jasmine Tea", "Sprites/jasmine_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Jasmine Tea Leaves", "Sprites/jasmine_tea_leaves", q: 5),
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
                     })
                 },
-                { "Jasmine Milk Tea", new FoodObject("Jasmine Milk Tea", "Sprites/jasmine_milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Jasmine Milk Tea", new FoodObject("Jasmine Milk Tea", "Sprites/jasmine_milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Jasmine Tea", "Sprites/jasmine_tea", q: 1),
                         new FoodObject("Milk Tea", "Sprites/milk_tea", q: 1),
                     })
                 },
-                { "Milk Tea", new FoodObject("Milk Tea", "Sprites/milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Milk Tea", new FoodObject("Milk Tea", "Sprites/milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
@@ -303,28 +312,28 @@ public class Database : MonoBehaviour
                         new FoodObject("Sugar", "Sprites/sugar", q: 2),
                     })
                 },
-                { "Oolong Tea", new FoodObject("Oolong Tea", "Sprites/oolong_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Oolong Tea", new FoodObject("Oolong Tea", "Sprites/oolong_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Oolong Tea Leaves", "Sprites/oolong_tea_leaves", q: 5),
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
                     })
                 },
-                { "Oolong Milk Tea", new FoodObject("Oolong Milk Tea", "Sprites/oolong_milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Oolong Milk Tea", new FoodObject("Oolong Milk Tea", "Sprites/oolong_milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Oolong Tea", "Sprites/oolong_tea", q: 1),
                         new FoodObject("Milk Tea", "Sprites/milk_tea", q: 1),
                     })
                 },
-                { "Thai Tea", new FoodObject("Thai Tea", "Sprites/thai_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Thai Tea", new FoodObject("Thai Tea", "Sprites/thai_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Thai Tea Leaves", "Sprites/thai_tea_leaves", q: 5),
                         new FoodObject("Boiling Water", "Sprites/boiling_water", q: 2),
                     })
                 },
-                { "Thai Milk Tea", new FoodObject("Thai Milk Tea", "Sprites/thai_milk_tea", "Models/salmon", "Kettle", 1f, 1, 1,
+                { "Thai Milk Tea", new FoodObject("Thai Milk Tea", "Sprites/thai_milk_tea", "Models/salmon", "Kettle", 1f, 1, 5,
                     new HashSet<FoodObject>()
                     {
                         new FoodObject("Thai Tea", "Sprites/thai_tea", q: 1),
@@ -344,7 +353,7 @@ public class Database : MonoBehaviour
             // level 0
             new Dictionary<string, FoodObject>()
             {
-                //null
+                {"Water", database[0]["Water"]},
             },
             // level 1
             new Dictionary<string, FoodObject>()
@@ -390,7 +399,7 @@ public class Database : MonoBehaviour
             //level 6
             new Dictionary<string, FoodObject>()
             {
-                {"Turkey", database[6]["Turkey"]},
+                {"Raw Turkey", database[6]["Raw Turkey"]},
                 {"Potato", database[6]["Potato"]},
                 {"Red Bean", database[6]["Red Bean"]},
             },
@@ -420,6 +429,7 @@ public class Database : MonoBehaviour
             // level 1
             new Dictionary<string, FoodObject>()
             {
+                {"Boiling Water", database[1]["Boiling Water"]},
                 {"Sliced Apples", database[1]["Sliced Apples"]},
                 {"Sliced Oranges", database[1]["Sliced Oranges"]},
                 {"Sliced Pears", database[1]["Sliced Pears"]},
@@ -428,7 +438,7 @@ public class Database : MonoBehaviour
             new Dictionary<string, FoodObject>()
             {
                 {"Bread", database[2]["Bread"]},
-                {"Scrambled Egg", database[2]["Scrambled Egg"]},
+                {"Scrambled Eggs", database[2]["Scrambled Eggs"]},
             },
             //level 3
             new Dictionary<string, FoodObject>()
@@ -465,7 +475,7 @@ public class Database : MonoBehaviour
             {
                 {"Black Tea", database[7]["Black Tea"]},
                 {"Black Milk Tea", database[7]["Black Milk Tea"]},
-                {"Earl Grey", database[7]["Earl Grey"]},
+                {"Earl Grey Tea", database[7]["Earl Grey Tea"]},
                 {"Earl Grey Milk Tea", database[7]["Earl Grey Milk Tea"]},
                 {"Green Tea", database[7]["Green Tea"]},
                 {"Green Milk Tea", database[7]["Green Milk Tea"]},

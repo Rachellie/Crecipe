@@ -12,8 +12,8 @@ public class FoodObject
     private string appliance;
     private float price = 1f;
     private int quantity = 1;
+	private int happiness = 1;
     private HashSet<FoodObject> ingredientsNeeded;
-	private bool onPlate = false;
 
     //default constructor
     public FoodObject()
@@ -24,11 +24,11 @@ public class FoodObject
 		appliance = "Pan";
         price = 1f;
         quantity = 1;
+		happiness = 1;
         ingredientsNeeded = null;
-		onPlate = false;
     }
 
-    public FoodObject(string name = "FAIL", string i = "Sprites/fail", string m = "Models/salmon", string app = "Pan", float p = 1f, int q = 1, HashSet<FoodObject> need = null, bool plate = false)
+    public FoodObject(string name = "FAIL", string i = "Sprites/fail", string m = "Models/salmon", string app = "Pan", float p = 1f, int q = 1, int h = 1, HashSet<FoodObject> need = null)
     {
         foodName = name;
         icon = i;
@@ -36,8 +36,8 @@ public class FoodObject
         appliance = app;
         price = p;
         quantity = q;
+		happiness = h;
         ingredientsNeeded = need;
-		onPlate = plate;
     }
 
     // copy constructor
@@ -49,8 +49,8 @@ public class FoodObject
         appliance = other.appliance;
         price = other.price;
         quantity = other.quantity;
+		happiness = other.happiness;
         ingredientsNeeded = other.ingredientsNeeded;
-		onPlate = other.onPlate;
     }
 
 
@@ -84,16 +84,16 @@ public class FoodObject
     {
         return quantity;
     }
+	
+	public int getHappiness()
+	{
+		return happiness;
+	}
 
     public HashSet<FoodObject> getIngNeeded()
     {
         return ingredientsNeeded;
     }
-	
-	public bool getPlate()
-	{
-		return onPlate;
-	}
 
     //SETTER METHODS
     public void setName(string newName)
@@ -125,16 +125,16 @@ public class FoodObject
     {
         quantity = newQuantity;
     }
+	
+	public void setHappiness(int newHappiness)
+	{
+		happiness = newHappiness;
+	}
 
     public void setIngNeeded(HashSet<FoodObject> newSet)
     {
         ingredientsNeeded = newSet;
     }
-	
-	public void setPlate(bool newPlate)
-	{
-		onPlate = newPlate;
-	}
 
     //OTHER METHODS HERE
 

@@ -6,47 +6,103 @@ using UnityEngine.UI;
 public class SettingsNavigation : MonoBehaviour
 {
     public Image image;
-    public Sprite otherSprite;
-    public Sprite _otherSprite;
+    public Sprite spriteOne;
+    public Sprite spriteTwo;
+    public Sprite spriteThree;
+
+    public Image maxPlayer;
+    public Sprite Two;
+    public Sprite Three;
 
     public List<GameObject> SetOne;
     public List<GameObject> SetTwo;
+    public List<GameObject> SetThree;
+
+    private int page = 1;
 
 
     public void NextPage()
     {
-        image.sprite = _otherSprite;
-        SetInactive(true);
+        if (page == 1)
+        {
+            page += 1;
+        }
+        else if (page == 2)
+        {
+            page += 1;
+        }
+        SetPanel();
     }
 
     public void BackPage()
     {
-        image.sprite = otherSprite;
-        SetInactive(false);
+        if (page == 2)
+        {
+            page -= 1;
+        }
+        else if (page == 3)
+        {
+            page -= 1;
+        }
+        SetPanel();
     }
 
-    public void SetInactive(bool page)
+    public void SetPanel()
     {
-        if(page) //1
+        if(page == 1) //1
         {
-            foreach(GameObject gameObject in SetOne)
+            image.sprite = spriteOne;
+            foreach (GameObject _object in SetTwo)
             {
-                gameObject.SetActive(false);
+                _object.SetActive(false);
             }
-            foreach(GameObject gameObject in SetTwo)
+            foreach (GameObject _object in SetThree)
             {
-                gameObject.SetActive(true);
+                _object.SetActive(false);
+            }
+            foreach (GameObject _object in SetOne)
+            {
+                _object.SetActive(true);
+            }
+        }
+        else if(page == 2)
+        {
+            image.sprite = spriteTwo;
+            foreach (GameObject _object in SetOne)
+            {
+                _object.SetActive(false);
+            }
+            foreach (GameObject _object in SetThree)
+            {
+                _object.SetActive(false);
+            }
+            foreach (GameObject _object in SetTwo)
+            {
+                _object.SetActive(true);
             }
         }
         else
         {
-            foreach (GameObject gameObject in SetOne)
+            image.sprite = spriteThree;
+            if(HostAndJoin.maxPlayers == 2)
             {
-                gameObject.SetActive(true);
+                maxPlayer.sprite = Two;
             }
-            foreach (GameObject gameObject in SetTwo)
+            else
             {
-                gameObject.SetActive(false);
+                maxPlayer.sprite = Three;
+            }
+            foreach (GameObject _object in SetOne)
+            {
+                _object.SetActive(false);
+            }
+            foreach (GameObject _object in SetTwo)
+            {
+                _object.SetActive(false);
+            }
+            foreach (GameObject _object in SetThree)
+            {
+                _object.SetActive(true);
             }
         }
     }

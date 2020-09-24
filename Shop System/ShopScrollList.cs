@@ -9,10 +9,11 @@ public class ShopScrollList : MonoBehaviour
 	public List<FoodObject> foodList;
 	public Transform contentPanel;
 	public ShopScrollList otherShop;
-	public Text myGoldDisplay;
+	public Text myPointsDisplay;
 	public SimpleObjectPool buttonObjectPool;
-	public float gold = 1 / 0f; // positive infinity
+	public float point = 1 / 0f; // positive infinity
 	public Text myCostDisplay;
+	public Text buyButtonText;
 	public static float cost = 0f;
 
 
@@ -23,14 +24,14 @@ public class ShopScrollList : MonoBehaviour
 		
 		if (isPlayer)
 		{
-			gold = PlayerData.player.GetMoney();
+            point = PlayerData.player.GetHappiness();
 		}
 		else
 		{
 			foodList = new List<FoodObject>();
-			for (int i = 0; i <= PlayerData.player.GetLevel() && i < PlayerData.player.GetTable().Count; ++i)
+			for (int i = 0; i <= PlayerData.player.GetLevel() && i < PlayerData.player.GetShopDB().Count; ++i)
 			{
-				foodList.AddRange(PlayerData.player.GetTable()[i]);
+				foodList.AddRange(PlayerData.player.GetShopDB()[i].Values);
 			}
 			
 		}
@@ -41,12 +42,12 @@ public class ShopScrollList : MonoBehaviour
 	{
 		if (isPlayer)
 		{
-			myGoldDisplay.text = "Gold: " + gold.ToString();
+            myPointsDisplay.text = "Points: " + point.ToString();
 			myCostDisplay.text = cost.ToString();
 		}
 		else
 		{
-			myGoldDisplay.text = "Ingredients";
+            myPointsDisplay.text = "Ingredients";
 		}
 		RemoveButtons();
 		AddButtons();
@@ -69,9 +70,9 @@ public class ShopScrollList : MonoBehaviour
 	{
 		RemoveButtons();
 		AddToBag();
-		PlayerData.player.SetMoney(gold);
-		ClearFoodItemList();
-		cost = 0f;
+		//PlayerData.player.SetMoney(gold);
+		//ClearFoodItemList();
+		//cost = 0f;
 		RefreshDisplay();
 	}
 
@@ -86,9 +87,26 @@ public class ShopScrollList : MonoBehaviour
 
 	private void AddToBag()
 	{
-		for (int i = 0; i < foodList.Count; ++i)
+		int amt = foodList.Count;
+		int index = 0;
+		
+		for (int i = 0; i < amt; ++i)
 		{
-			PlayerData.player.AddFoodItem(foodList[i]);
+			if(PlayerData.player.AddFoodItem(foodList[index]))
+			{
+				PlayerData.player.AddHappiness(-1* foodList[index].getPrice() * foodList[index].getQuantity());
+				cost -= foodList[index].getPrice() * foodList[index].getQuantity();
+				foodList.RemoveAt(index);
+			}
+			else
+			{
+				++index;
+			}
+		}
+		
+		if(index != 0)
+		{
+			buyButtonText.text = "Bag is full";
 		}
 	}
 
@@ -99,10 +117,14 @@ public class ShopScrollList : MonoBehaviour
 
 	public void TryTransferFoodItemToOtherShop(FoodObject food)
 	{
-		if (otherShop.gold >= food.getPrice())
+		food = new FoodObject(food);
+		
+		if (otherShop.point >= food.getPrice())
 		{
-			gold += food.getPrice();
-			otherShop.gold -= food.getPrice();
+			buyButtonText.text = "Buy";
+
+            point += food.getPrice();
+			otherShop.point -= food.getPrice();
 
 			AddFoodItem(food, otherShop);
 			RemoveFoodItem(food, this);
