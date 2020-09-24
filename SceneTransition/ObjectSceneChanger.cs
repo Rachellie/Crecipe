@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
-public class ObjectSceneChanger : MonoBehaviour
+public class ObjectSceneChanger : MonoBehaviour, IPointerDownHandler
 {
 	public string sceneToLoad;
 	public Transform player;
 	public float range = 2f;
 	
-	void OnMouseDown()
+	public void OnPointerDown(PointerEventData data)
 	{
 		float distance = Vector3.Distance(player.transform.position, gameObject.transform.position);
 		
