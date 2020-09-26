@@ -20,6 +20,7 @@ public class Appliance : MonoBehaviour
 	public Transform player;
 	public float range = 2f;
 	public Bag bag;
+	public Transform appIng;
 	
     private bool inUse = false;
     private string appName;
@@ -99,6 +100,10 @@ public class Appliance : MonoBehaviour
     //adds and ingredient into the appliance
     public void addIngToApp(FoodObject food, HashSet<FoodObject> foodSet)
     {
+		Transform onHead = player.GetChild(2);
+		onHead.SetParent(null, true);
+		StartCoroutine(Slerp(onHead));
+		
 		food.subOneQ();
 		PlayerData.player.SetCurrentFood(food);
 		
@@ -118,6 +123,24 @@ public class Appliance : MonoBehaviour
 		foodSet.Add(food);
         prevIng = food.getName();
     }
+	
+	IEnumerator Slerp(Transform food)
+	{
+		float timeElapsed = 0f;
+		
+		Vector3 start = food.position;
+		Vector3 end = transform.position; // self
+		
+		while(timeElapsed < 0.25f)
+		{
+			food.position = Vector3.Slerp(start, end, timeElapsed/0.25f);
+			food.Rotate(0, 2, 0);
+			timeElapsed += Time.deltaTime;
+			yield return null;
+		}
+		
+		Destroy(food.gameObject);
+	}
 
     //removes the most recent added ingredient from appliance
     public FoodObject removeIngFromApp()
@@ -141,26 +164,8 @@ public class Appliance : MonoBehaviour
         }
         return food;
     }
-
-    //produces FoodObject product
-    public FoodObject execute()
-    {
-        //TEMPORARY
-        FoodObject food = new FoodObject();
-        //TEMPORARY
-        
-        //find if this recipe exists
-        List<FoodObject> foodList = PlayerData.player.GetTable()[ingredientSet.Count];
-        
-        //reset the set and prevIng and usage
-        ingredientSet.Clear();
-        prevIng = "";
-        inUse = false;
-
-        return food;
-    }
 	
-	public void MouseDown(HashSet<FoodObject> foodSet, string appName)
+	public void MouseDown(ref HashSet<FoodObject> foodSet, string appName, string sound)
 	{
 		float distance = Vector3.Distance(player.transform.position, gameObject.transform.position);
 		
@@ -171,43 +176,57 @@ public class Appliance : MonoBehaviour
 				if(PlayerData.player.GetCurrentFood().getName() == "Plate")
 				{
 					FoodObject food = null;
-					FoodObject recipe;
-					List<List<FoodObject>> recipeTable = PlayerData.player.GetRecipeTable();
 					bool fail = true;
+
+                    for(int i = 0; i < PlayerData.player.GetLevel() && i < PlayerData.player.GetRecipeDB().Count; i++)
+                    {
+                        foreach(FoodObject match in PlayerData.player.GetRecipeDB()[i].Values)
+                        {
+                            if(match.getAppliance() == appName && foodSet.SetEquals(match.getIngNeeded()))
+                            {
+                                fail = false;
+                                Debug.Log("Matching recipe!");
+                                food = new FoodObject(match);
+                                break;
+                            }
+                        }
+                    }
 					
-					for(int i = 0; i < recipeTable.Count; ++i)
+					if(fail)
 					{
-						for(int j = 0; j < recipeTable[i].Count; ++j)
+						Debug.Log("searching hidden db");
+						for(int i = 0; i < PlayerData.player.GetLevel() && i < PlayerData.player.GetHiddenDB().Count; i++)
 						{
-							recipe = recipeTable[i][j];
-							
-							if(recipe.getAppliance() == appName && foodSet.SetEquals(recipe.getIngNeeded()))
+							foreach(FoodObject match in PlayerData.player.GetHiddenDB()[i].Values)
 							{
-								fail = false;
-								Debug.Log("matching recipe!");
-								food = new FoodObject(recipe);
-								food.setPlate(true);
-								break;
+								if(match.getAppliance() == appName && foodSet.SetEquals(match.getIngNeeded()))
+								{
+									fail = false;
+									Debug.Log("Matching HIDDEN recipe!");
+									food = new FoodObject(match);
+                                    PlayerData.database.transferRecipe(i, match.getName());
+									break;
+								}
 							}
 						}
 					}
 					
 					if(fail)
 					{
-						food = new FoodObject("FAIL", "Sprites/temp2", "Models/salmon", plate: true);
+						food = PlayerData.player.GetDB()[0]["Fail"];
 					}
 					
 					foodSet.Clear();
 					PlayerData.player.SetCurrentFood(food);
 					bag.Refresh();
+					
+					ClientSend.UpdateAppliance(appName, "Plate");
 				}
 				else
 				{
+					ClientSend.UpdateAppliance(appName, PlayerData.player.GetCurrentFood().getName()); //
 					addIngToApp(PlayerData.player.GetCurrentFood(), foodSet);
-					if(PlayerData.player.GetCurrentFood().getQuantity() <= 0)
-					{
-						PlayerData.player.SetCurrentFood(null);
-					}
+                    FindObjectOfType<AudioManager>().Play(sound);
 					
 					bag.Refresh();
 					
@@ -217,6 +236,20 @@ public class Appliance : MonoBehaviour
 						Debug.Log(ing.getName() + " x" + ing.getQuantity());
 					}
 				}
+			}
+			else // open popup to show set of ingredients inside
+			{
+				if(appIng.gameObject.activeInHierarchy)
+				{
+					appIng.gameObject.SetActive(false);
+				}
+				else
+				{
+					appIng.gameObject.SetActive(true);
+				}
+				
+				AppIng appIngScript = appIng.GetComponent<AppIng>();
+				appIngScript.SetContents(ref foodSet);
 			}
 		}
 	}
